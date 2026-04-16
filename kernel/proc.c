@@ -664,6 +664,26 @@ either_copyin(void *dst, int user_src, uint64 src, uint64 len)
   }
 }
 
+int pgaccess(uint64 start_address, int page_number, uint64 mask)
+{
+    uint64 mask_buffer  = 0;
+    pte_t * pte;
+    for (int i = 0; i < page_number; i++){
+      pte = walk(myproc()->pagetable, (start_address+PGSIZE*i), 0);
+      if (!pte) return -1;
+      if (*pte & PTE_A) {
+        mask_buffer |= (1 << i);
+        *pte &= ~PTE_A; 
+    }
+
+  }
+        
+    copyout(myproc()->pagetable, mask, (char*)&mask_buffer, sizeof(mask_buffer));
+    return 0;
+
+
+}
+
 // Print a process listing to console.  For debugging.
 // Runs when user types ^P on console.
 // No lock to avoid wedging a stuck machine further.

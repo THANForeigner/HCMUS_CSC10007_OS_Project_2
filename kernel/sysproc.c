@@ -1,101 +1,116 @@
-#include "types.h"
-#include "riscv.h"
 #include "defs.h"
-#include "param.h"
 #include "memlayout.h"
-#include "spinlock.h"
+#include "param.h"
 #include "proc.h"
+#include "riscv.h"
+#include "spinlock.h"
+#include "types.h"
+#include <stdint.h>
 
 uint64
-sys_exit(void)
+sys_exit (void)
 {
   int n;
-  argint(0, &n);
-  exit(n);
-  return 0;  // not reached
+  argint (0, &n);
+  exit (n);
+  return 0; // not reached
 }
 
 uint64
-sys_getpid(void)
+sys_getpid (void)
 {
-  return myproc()->pid;
+  return myproc ()->pid;
 }
 
 uint64
-sys_fork(void)
+sys_fork (void)
 {
-  return fork();
+  return fork ();
 }
 
 uint64
-sys_wait(void)
+sys_wait (void)
 {
   uint64 p;
-  argaddr(0, &p);
-  return wait(p);
+  argaddr (0, &p);
+  return wait (p);
 }
 
 uint64
-sys_sbrk(void)
+sys_sbrk (void)
 {
   uint64 addr;
   int n;
 
-  argint(0, &n);
-  addr = myproc()->sz;
-  if(growproc(n) < 0)
+  argint (0, &n);
+  addr = myproc ()->sz;
+  if (growproc (n) < 0)
     return -1;
   return addr;
 }
 
 uint64
-sys_sleep(void)
+sys_sleep (void)
 {
   int n;
   uint ticks0;
 
-  argint(0, &n);
-  if(n < 0)
+  argint (0, &n);
+  if (n < 0)
     n = 0;
-  acquire(&tickslock);
+  acquire (&tickslock);
   ticks0 = ticks;
-  while(ticks - ticks0 < n){
-    if(killed(myproc())){
-      release(&tickslock);
-      return -1;
+  while (ticks - ticks0 < n)
+    {
+      if (killed (myproc ()))
+        {
+          release (&tickslock);
+          return -1;
+        }
+      sleep (&ticks, &tickslock);
     }
-    sleep(&ticks, &tickslock);
-  }
-  release(&tickslock);
+  release (&tickslock);
   return 0;
 }
 
 uint64
-sys_kill(void)
+sys_kill (void)
 {
   int pid;
 
-  argint(0, &pid);
-  return kill(pid);
+  argint (0, &pid);
+  return kill (pid);
 }
 
 // return how many clock tick interrupts have occurred
 // since start.
 uint64
-sys_uptime(void)
+sys_uptime (void)
 {
   uint xticks;
 
-  acquire(&tickslock);
+  acquire (&tickslock);
   xticks = ticks;
-  release(&tickslock);
+  release (&tickslock);
   return xticks;
 }
 
 uint64
-sys_setvmprint(void) {
+sys_setvmprint (void)
+{
   int n;
-  argint(0, &n);
-  myproc()->print_pt_flag = n;
+  argint (0, &n);
+  myproc ()->print_pt_flag = n;
   return 0;
+}
+
+uint64
+sys_pgaccess (void)
+{
+  uint64 start_address, mask;
+  int page_number;
+  argaddr (0, &start_address);
+  argint (1, &page_number);
+  argaddr (2, &mask);
+  return pgaccess (start_address, page_number, mask);
 }
