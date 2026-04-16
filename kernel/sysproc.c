@@ -91,3 +91,11 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_setvmprint(void) {
+  int n;
+  argint(0, &n);
+  myproc()->print_pt_flag = n;
+  return 0;
+}
