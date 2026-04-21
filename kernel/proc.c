@@ -674,7 +674,7 @@ int pgaccess(uint64 start_address, int page_number, uint64 mask)
       pte = walk(myproc()->pagetable, (start_address+PGSIZE*i), 0);
       if (!pte) return -1;
       if (*pte & PTE_A) {
-        mask_buffer |= (1 << i);
+        mask_buffer |= (1ULL << i);
         *pte &= ~PTE_A; 
     }
 
