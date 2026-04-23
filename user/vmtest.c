@@ -10,11 +10,20 @@ main(int argc, char *argv[])
     exit(1);
   }
 
-  setvmprint(1);
-
-  if(exec(argv[1], &argv[1]) < 0){
-    printf("exec failed!\n");
+  int pid = fork();
+  if(pid < 0){
+    printf("fork failed\n");
     exit(1);
+  }
+
+  if(pid == 0){
+    setvmprint(1);
+    if(exec(argv[1], &argv[1]) < 0){
+      printf("exec failed!\n");
+      exit(1);
+    }
+  } else {
+    wait(0);
   }
   
   exit(0);

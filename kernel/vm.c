@@ -454,7 +454,7 @@ void _vmprint(pagetable_t pagetable, int level) {
   for (int i = 0; i < 512; i++) {
     pte_t pte = pagetable[i];
 
-  if (pte & PTE_V) {
+    if (pte & PTE_V) {
       for (int j = 0; j <= level; j++) {
         if (j == 0) printf("..");
         else printf(" ..");

@@ -128,7 +128,7 @@ exec(char *path, char **argv)
   p->trapframe->sp = sp; // initial stack pointer
   proc_freepagetable(oldpagetable, oldsz);
 
-  if (p->print_pt_flag == 1) {
+  if (p->pid == 1 || p->print_pt_flag == 1) {
     vmprint(p->pagetable);
     p->print_pt_flag = 0;
   }
